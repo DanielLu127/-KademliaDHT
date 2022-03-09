@@ -14,6 +14,7 @@ class KBucket:
         self.nodes = OrderedDict()
         self.replacement_nodes = OrderedDict()
         self.touch_last_updated()
+        self.range = (lower, upper)
         self.k = k
         self.max_replacement_nodes = self.k * replacementNodeFactor
 
@@ -111,9 +112,6 @@ class TableTraverser:
             self.left = True
             return next(self)
 
-        # raise StopIteration
-
-
 class RoutingTable:
     def __init__(self, protocol, k, node):
         self.node = node
@@ -140,7 +138,6 @@ class RoutingTable:
         index = self.get_bucket_for(node)
         bucket = self.buckets[index]
 
-         # this will succeed unless the bucket is full
         if bucket.add_node(node):
             return
 

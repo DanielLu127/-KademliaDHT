@@ -8,7 +8,7 @@ from utils import digest
 class KademliaProtocol(RPCProtocol):
     def __init__(self, source, storage, k):
         RPCProtocol.__init__(self)
-        self.router = RoutingTable(self, k, source_node)
+        self.router = RoutingTable(self, k, source)
         self.storage = storage
         self.source = source
 
