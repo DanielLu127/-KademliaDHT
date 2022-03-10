@@ -11,10 +11,7 @@ log = logging.getLogger('kademlia')
 log.addHandler(handler)
 log.setLevel(logging.DEBUG)
 
-val = 10
-nid = val.to_bytes(1, 'little')
-server = Server(node_id=nid)
-
+server = Server()
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
