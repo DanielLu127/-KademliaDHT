@@ -6,16 +6,17 @@ import pickle
 import asyncio
 import logging
 
-from kademlia.protocol import KademliaProtocol
-from kademlia.utils import digest
-from kademlia.storage import ForgetfulStorage
-from kademlia.node import Node
-from kademlia.crawling import ValueSpiderCrawl
-from kademlia.crawling import NodeSpiderCrawl
+from protocol import KademliaProtocol
+from utils import digest
+from storage import ForgetfulStorage
+from node import Node
+from crawling import ValueSpiderCrawl
+from crawling import NodeSpiderCrawl
 
 log = logging.getLogger('kademlia')
 log.setLevel(logging.DEBUG)
 log.addHandler(logging.StreamHandler())
+
 
 class Server:
     protocol_class = KademliaProtocol
@@ -54,7 +55,7 @@ class Server:
         if result[0]:
             return Node(result[1], addr[0], addr[1])
         else:
-            None
+            return None
 
     async def get(self, key):
         log.info("Looking up key %s", key)
@@ -65,7 +66,7 @@ class Server:
             return self.storage.get(dkey)
 
         node = Node(dkey)
-        nearest = self.protocol.router.find_neighbors(node)
+        nearest = self.protocol.router.findNeighbors(node)
         if not nearest:
             return None
 
@@ -73,14 +74,16 @@ class Server:
         return await spider.find()
 
     async def set(self, key, value):
-        log.info("setting '%s' = '%s' on netwoofeo3efoork", key, value)
+        log.info("setting '%s' = '%s' on network", key, value)
         dkey = digest(key)
         node = Node(dkey)
-        nearest = self.protocol.router.find_neighbors(node)
+        nearest = self.protocol.router.findNeighbors(node)
         if not nearest:
             return False
 
         nodes = await NodeSpiderCrawl(self.protocol, node, nearest, self.ksize, self.alpha).find()
+
+        log.info("setting '%s' on %s", dkey.hex(), list(map(str, nodes)))
 
         biggest = 0
         for n in nodes:

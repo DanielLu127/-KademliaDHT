@@ -8,7 +8,9 @@ from node import Node
 from routing import RoutingTable
 from utils import digest
 
-log = logging.getLogger(__name__)
+log = logging.getLogger('kademlia')
+log.setLevel(logging.DEBUG)
+log.addHandler(logging.StreamHandler())
 
 
 class KademliaProtocol(RPCProtocol):
