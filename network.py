@@ -13,8 +13,9 @@ from kademlia.node import Node
 from kademlia.crawling import ValueSpiderCrawl
 from kademlia.crawling import NodeSpiderCrawl
 
-log = logging.getLogger(__name__)
-
+log = logging.getLogger('kademlia')
+log.setLevel(logging.DEBUG)
+log.addHandler(logging.StreamHandler())
 
 class Server:
     protocol_class = KademliaProtocol
