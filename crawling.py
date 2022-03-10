@@ -1,6 +1,6 @@
 
-from kademlia.node import Node, NodeHeap
-from kademlia.utils import gather_dict
+from node import Node, NodeHeap
+from utils import gather_dict
 
 
 class SpiderCrawl:
