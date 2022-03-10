@@ -11,7 +11,7 @@ log = logging.getLogger('kademlia')
 log.addHandler(handler)
 log.setLevel(logging.DEBUG)
 
-server = Server()
+server = None
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
@@ -20,6 +20,7 @@ def parse_arguments():
     parser.add_argument("-i", "--ip", help="IP address of existing node", type=str, default=None)
     parser.add_argument("-p", "--port", help="port number of existing node", type=int, default=None)
     parser.add_argument("-m", "--myPort", help="port number for new node", type=int, default=None)
+    parser.add_argument("-d", "--id", help="give id of the new node", type=int, default=None)
 
     return parser.parse_args()
 
@@ -58,6 +59,14 @@ def create_bootstrap_node():
 
 def main():
     args = parse_arguments()
+
+    global server
+
+    if args.id != None:
+        nid = args.id.to_bytes(1, 'little')
+        server = Server(node_id=nid)
+    else:
+        server = Server()
 
     if args.ip and args.port:
         connect_to_bootstrap_node(args)
