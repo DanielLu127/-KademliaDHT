@@ -1,6 +1,3 @@
-"""
-Package for interacting on the network at a high level.
-"""
 import random
 import pickle
 import asyncio
