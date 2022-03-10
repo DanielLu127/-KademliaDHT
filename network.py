@@ -85,7 +85,7 @@ class Server:
         results = []
         for node_id in self.protocol.get_refresh_ids():
             node = Node(node_id)
-            nearest = self.protocol.router.find_neighbors(node, self.alpha)
+            nearest = self.protocol.router.findNeighbors(node, self.alpha)
             spider = NodeSpiderCrawl(self.protocol, node, nearest,
                                      self.ksize, self.alpha)
             results.append(spider.find())
@@ -106,7 +106,7 @@ class Server:
         storing them if this server is going down for a while.  When it comes
         back up, the list of nodes can be used to bootstrap.
         """
-        neighbors = self.protocol.router.find_neighbors(self.node)
+        neighbors = self.protocol.router.findNeighbors(self.node)
         return [tuple(n)[-2:] for n in neighbors]
 
     async def bootstrap(self, addrs):
@@ -141,7 +141,7 @@ class Server:
         if self.storage.get(dkey) is not None:
             return self.storage.get(dkey)
         node = Node(dkey)
-        nearest = self.protocol.router.find_neighbors(node)
+        nearest = self.protocol.router.findNeighbors(node)
         if not nearest:
             log.warning("There are no known neighbors to get key %s", key)
             return None
@@ -164,7 +164,7 @@ class Server:
         """
         node = Node(dkey)
 
-        nearest = self.protocol.router.find_neighbors(node)
+        nearest = self.protocol.router.findNeighbors(node)
         if not nearest:
             log.warning("There are no known neighbors to set key %s",
                         dkey.hex())
