@@ -1,11 +1,12 @@
-import asyncio
-import operator
-
 import heapq
 import time
+import operator
+import asyncio
 
+from itertools import chain
 from collections import OrderedDict
 from utils import shared_prefix, bytes_to_bit_string
+
 
 class KBucket:
     def __init__(self, lower, upper, k, replacementNodeFactor=5):
@@ -14,8 +15,8 @@ class KBucket:
         self.nodes = OrderedDict()
         self.replacement_nodes = OrderedDict()
         self.touch_last_updated()
-        self.range = (lower, upper)
         self.k = k
+        self.range = (lower, upper)
         self.max_replacement_nodes = self.k * replacementNodeFactor
 
     def touch_last_updated(self):
@@ -25,16 +26,15 @@ class KBucket:
         return list(self.nodes.values())
 
     def split(self):
-        mid = (self.lower + self.upper) // 2
-        one = KBucket(self.lower, mid, self.k)
-        two = KBucket(mid + 1, self.upper, self.k)
+        midpoint = (self.lower + self.upper) // 2
+        one = KBucket(lower, midpoint, self.k)
+        two = KBucket(midpoint + 1, upper, self.k)
         nodes = chain(self.nodes.values(), self.replacement_nodes.values())
         for node in nodes:
             bucket = one if node.long_id <= midpoint else two
             bucket.add_node(node)
 
         return (one, two)
-
 
     def remove_node(self, node):
         if node.id in self.replacement_nodes:
@@ -46,7 +46,6 @@ class KBucket:
             if self.replacement_nodes:
                 newnode_id, newnode = self.replacement_nodes.popitem()
                 self.nodes[newnode_id] = newnode
-
 
     def has_in_range(self, node):
         return self.lower <= node.long_id <= self.upper
@@ -69,7 +68,6 @@ class KBucket:
             return False
         return True
 
-
     def depth(self):
         vals = self.nodes.values()
         sprefix = shared_prefix([bytes_to_bit_string(n.id) for n in vals])
@@ -83,7 +81,6 @@ class KBucket:
 
     def __len__(self):
         return len(self.nodes)
-
 
 
 class TableTraverser:
@@ -112,6 +109,9 @@ class TableTraverser:
             self.left = True
             return next(self)
 
+        raise StopIteration
+
+
 class RoutingTable:
     def __init__(self, protocol, k, node):
         self.node = node
@@ -121,28 +121,31 @@ class RoutingTable:
 
     def flush(self):
         self.buckets = [KBucket(0, 2 ** 160, self.k)]
+
     def split_bucket(self, index):
         one, two = self.buckets[index].split()
         self.buckets[index] = one
         self.buckets.insert(index + 1, two)
+
     def lonely_buckets(self):
         hrago = time.monotonic() - 3600
         return [b for b in self.buckets if b.last_updated < hrago]
+
     def remove_contact(self, node):
         index = self.get_bucket_for(node)
         self.buckets[index].remove_node(node)
+
     def is_new_node(self, node):
         index = self.get_bucket_for(node)
         return self.buckets[index].is_new_node(node)
+
     def add_contact(self, node):
         index = self.get_bucket_for(node)
         bucket = self.buckets[index]
-
         if bucket.add_node(node):
             return
 
-        # Per section 4.2 of paper, split if the bucket has the node
-        # in its range or if the depth is not congruent to 0 mod 5
+        # kademlia paper 4.2
         if bucket.has_in_range(self.node) or bucket.depth() % 5 != 0:
             self.split_bucket(index)
             self.add_contact(node)
