@@ -4,8 +4,8 @@ import heapq
 
 class Node:
     def __init__(self, node_id, ip=None, port=None):
-        self.id = node_id  # pylint: disable=invalid-name
-        self.ip = ip  # pylint: disable=invalid-name
+        self.id = node_id 
+        self.ip = ip
         self.port = port
         self.long_id = int(node_id.hex(), 16)
 
@@ -61,11 +61,6 @@ class NodeHeap:
         return heapq.heappop(self.heap)[1] if self else None
 
     def push(self, nodes):
-        """
-        Push nodes onto heap.
-
-        @param nodes: This can be a single item or a C{list}.
-        """
         if not isinstance(nodes, list):
             nodes = [nodes]
 
